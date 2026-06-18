@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MEPla 工程進捗共有</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">M</div>
+          <div>
+            <h1>MEPla</h1>
+            <p>工程進捗共有</p>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <a class="nav-item is-active" href="#progress">進捗入力</a>
+          <a class="nav-item" href="#chat">リアルタイム共有</a>
+          <a class="nav-item" href="#analytics">集計</a>
+          <a class="nav-item" href="#future">拡張予定</a>
+        </nav>
+
+        <div class="status-panel">
+          <span class="status-dot" id="connectionDot"></span>
+          <div>
+            <strong id="connectionLabel">デモモード</strong>
+            <p id="connectionText">Firebase設定後にリアルタイム同期します</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="topbar">
+          <div>
+            <p class="eyebrow">Construction Progress Board</p>
+            <h2>作業進捗</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="seedButton" type="button" title="デモデータ追加" aria-label="デモデータ追加">
+              <span aria-hidden="true">＋</span>
+            </button>
+            <button class="button secondary" id="exportButton" type="button">CSV出力</button>
+          </div>
+        </section>
+
+        <section class="layout">
+          <form class="entry-panel" id="progressForm" autocomplete="off">
+            <div class="section-heading">
+              <span>入力フォーム</span>
+              <strong>正本データ</strong>
+            </div>
+
+            <div class="field-grid">
+              <label>
+                <span>業者名</span>
+                <input id="uname" name="uname" type="text" placeholder="〇〇設備" required />
+              </label>
+
+              <label>
+                <span>階</span>
+                <select id="floor" name="floor" required>
+                  <option value="1F">1F</option>
+                  <option value="2F">2F</option>
+                  <option value="3F">3F</option>
+                  <option value="RF">RF</option>
+                </select>
+              </label>
+
+              <label>
+                <span>工区</span>
+                <select id="area" name="area" required>
+                  <option value="A工区">A工区</option>
+                  <option value="B工区">B工区</option>
+                  <option value="C工区">C工区</option>
+                </select>
+              </label>
+
+              <label>
+                <span>工種</span>
+                <select id="trade" name="trade" required>
+                  <option value="配管">配管</option>
+                  <option value="ダクト">ダクト</option>
+                  <option value="保温">保温</option>
+                  <option value="計装">計装</option>
+                  <option value="機器搬入">機器搬入</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>作業内容</span>
+              <input id="work" name="work" type="text" placeholder="冷温水配管施工" required />
+            </label>
+
+            <div class="progress-control">
+              <div class="progress-head">
+                <label for="progress">進捗率</label>
+                <output id="progressValue">50%</output>
+              </div>
+              <input id="progress" name="progress" type="range" min="5" max="100" step="5" value="50" />
+              <div class="ticks" aria-hidden="true">
+                <span>5</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100</span>
+              </div>
+            </div>
+
+            <label>
+              <span>コメント</span>
+              <textarea id="text" name="text" rows="3" placeholder="明日完了予定"></textarea>
+            </label>
+
+            <button class="button primary" type="submit">進捗を送信</button>
+          </form>
+
+          <section class="chat-panel" id="chat">
+            <div class="section-heading">
+              <span>リアルタイムチャット</span>
+              <strong id="messageCount">0件</strong>
+            </div>
+            <div class="filters" aria-label="表示フィルター">
+              <button class="filter-chip is-active" type="button" data-filter="all">すべて</button>
+              <button class="filter-chip" type="button" data-filter="progress">進捗</button>
+              <button class="filter-chip" type="button" data-filter="notice">通知</button>
+              <button class="filter-chip" type="button" data-filter="unchecked">未確認</button>
+            </div>
+            <div class="chat-list" id="chatList" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <section class="analytics" id="analytics">
+          <div class="section-heading">
+            <span>全体進捗率グラフ</span>
+            <strong id="overallProgress">0%</strong>
+          </div>
+          <div class="analytics-grid" id="tradeSummary"></div>
+        </section>
+
+        <section class="future-panel" id="future">
+          <div class="future-item">
+            <span>Weather API</span>
+            <strong>天候リスク管理</strong>
+          </div>
+          <div class="future-item">
+            <span>Gantt Chart</span>
+            <strong>業者・工種・工区別工程</strong>
+          </div>
+          <div class="future-item">
+            <span>Spreadsheet</span>
+            <strong>集計・可視化・帳票補助</strong>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="messageTemplate">
+      <article class="message">
+        <div class="message-top">
+          <strong class="message-uname"></strong>
+          <time class="message-time"></time>
+        </div>
+        <div class="message-meta"></div>
+        <h3 class="message-work"></h3>
+        <div class="message-progress">
+          <span class="bar"><span></span></span>
+          <strong></strong>
+        </div>
+        <div class="message-foot">
+          <span class="check-badge"></span>
+          <p class="message-text"></p>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

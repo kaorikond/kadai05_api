@@ -1,0 +1,22 @@
+{
+    "rules": {
+      "progressMessages": {
+        ".read": true,
+        ".write": true,
+        "$messageId": {
+          ".validate": "newData.hasChildren(['uname', 'floor', 'area', 'trade', 'work', 'progress', 'check', 'text', 'type', 'createdAt'])",
+          "uname": { ".validate": "newData.isString()" },
+          "floor": { ".validate": "newData.isString()" },
+          "area": { ".validate": "newData.isString()" },
+          "trade": { ".validate": "newData.isString()" },
+          "work": { ".validate": "newData.isString()" },
+          "progress": { ".validate": "newData.isString() && newData.val().matches(/^(5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100)$/)" },
+          "check": { ".validate": "newData.val() === '未確認' || newData.val() === '確認済'" },
+          "text": { ".validate": "newData.isString()" },
+          "type": { ".validate": "newData.val() === 'progress' || newData.val() === 'notice'" },
+          "createdAt": { ".validate": "newData.isString()" }
+        }
+      }
+    }
+  }
+  
